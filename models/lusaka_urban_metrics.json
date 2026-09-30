@@ -1,0 +1,13 @@
+{
+  "load_model_rmse": 15.86,
+  "load_model_r2": 0.83,
+  "solar_model_rmse": 0.97,
+  "solar_model_r2": 0.99,
+  "baseline_rmse": 22.64,
+  "improvement_over_baseline_pct": 29.9,
+  "load_feature_importances": {
+    "hour": 0.695,
+    "temperature_c": 0.295,
+    "is_weekend": 0.01
+  }
+}

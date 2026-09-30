@@ -1,0 +1,15 @@
+numpy
+pandas>=3,<4
+scikit-learn==1.8.0
+joblib
+fastapi
+pydantic
+uvicorn
+python-multipart
+streamlit
+plotly
+prophet
+sqlalchemy
+requests
+Pillow
+fpdf2

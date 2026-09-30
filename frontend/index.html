@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nyika-Grid — Live Grid Forecast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111821;
+    --ink-soft:#1A242E;
+    --paper:#F6F1E7;
+    --paper-dim:#EAE3D3;
+    --copper:#B8703A;
+    --copper-bright:#D68A4E;
+    --gold:#E3A857;
+    --earth:#A84432;
+    --savanna:#8EAC70;
+    --text-on-ink:#F2EEE4;
+    --text-on-ink-dim:#B8C1C7;
+    --line:rgba(246,241,231,0.12);
+    --line-strong:rgba(246,241,231,0.24);
+    --focus:#F0B45F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:radial-gradient(ellipse at 76% 0%,rgba(184,112,58,0.09),transparent 34%),var(--ink);
+    color:var(--text-on-ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--copper);color:var(--ink);}
+
+  a{color:var(--copper-bright);}
+
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    margin:0;
+  }
+
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    border-bottom:1px solid var(--line);
+    padding:14px 0;
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:rgba(17,24,33,0.94);
+    backdrop-filter:blur(12px);
+  }
+  header .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    min-height:44px;
+  }
+  .wordmark{
+    font-family:'Fraunces',serif;
+    font-size:21px;
+    font-weight:600;
+    letter-spacing:0.2px;
+  }
+  .wordmark span{color:var(--copper-bright);}
+
+  .region-switch{
+    display:flex;
+    background:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:3px;
+    gap:2px;
+  }
+  .region-switch button{
+    appearance:none;
+    border:none;
+    background:transparent;
+    color:var(--text-on-ink-dim);
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14px;
+    min-height:38px;
+    padding:7px 13px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .region-switch button.active{
+    background:var(--copper);
+    color:var(--ink);
+    font-weight:500;
+  }
+
+  .conn-status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--text-on-ink-dim);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:7px 10px;
+    background:rgba(255,255,255,0.025);
+  }
+  .conn-dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--savanna);
+    box-shadow:0 0 0 0 rgba(107,133,88,0.6);
+    animation:pulse 2.4s infinite;
+  }
+  .conn-dot.offline{background:var(--earth);animation:none;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(107,133,88,0.5);}
+    70%{box-shadow:0 0 0 7px rgba(107,133,88,0);}
+    100%{box-shadow:0 0 0 0 rgba(107,133,88,0);}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    padding:48px 0 36px;
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .grid-motif{
+    position:absolute;
+    inset:0;
+    opacity:0.5;
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative;z-index:1;}
+
+  .hero-region-label{
+    font-size:12px;
+    color:var(--text-on-ink-dim);
+    margin-bottom:10px;
+    text-transform:uppercase;
+  }
+
+  .readout-row{
+    display:flex;
+    align-items:baseline;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .readout{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:72px;
+    font-weight:600;
+    color:var(--copper-bright);
+    line-height:1;
+    transition:color 0.3s ease;
+  }
+  .readout.at-risk{color:var(--earth);}
+  .readout-unit{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:22px;
+    color:var(--text-on-ink-dim);
+  }
+
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 11px;
+    border-radius:6px;
+    font-size:13px;
+    font-weight:500;
+    background:rgba(107,133,88,0.16);
+    color:var(--savanna);
+    border:1px solid rgba(107,133,88,0.35);
+    margin-top:16px;
+  }
+  .status-pill.at-risk{
+    background:rgba(168,68,50,0.16);
+    color:#E0866F;
+    border-color:rgba(168,68,50,0.4);
+  }
+
+  .sub-readouts{
+    display:flex;
+    gap:0;
+    margin-top:24px;
+    flex-wrap:wrap;
+  }
+  .sub-readout{padding:0 24px;border-left:1px solid var(--line);}
+  .sub-readout:first-child{padding-left:0;border-left:0;}
+  .sub-readout .label{
+    font-size:12px;
+    color:var(--text-on-ink-dim);
+    margin-bottom:4px;
+  }
+  .sub-readout .value{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:20px;
+  }
+  .sub-readout.solar .value{color:var(--gold);}
+
+  /* ---------- Controls ---------- */
+  .controls{
+    margin-top:30px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:22px;
+  }
+  .control label{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    color:var(--text-on-ink-dim);
+    margin-bottom:8px;
+  }
+  .control label .val{color:var(--text-on-ink);font-family:'IBM Plex Mono',monospace;}
+  input[type=range]{
+    width:100%;
+    accent-color:var(--copper);
+    background:transparent;
+    cursor:pointer;
+  }
+  input[type=range]:focus-visible{outline:2px solid var(--focus);outline-offset:5px;}
+  .checkbox-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:14px;
+    color:var(--text-on-ink-dim);
+    margin-top:4px;
+  }
+  .checkbox-row input{accent-color:var(--copper);width:16px;height:16px;}
+
+  .whatif-row{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    appearance:none;
+    border:1px solid var(--line-strong);
+    background:var(--ink-soft);
+    color:var(--text-on-ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:13px;
+    min-height:40px;
+    padding:9px 14px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .btn:focus-visible,.region-switch button:focus-visible,input:focus-visible,textarea:focus-visible{
+    outline:2px solid var(--focus);
+    outline-offset:3px;
+  }
+  .btn:disabled{cursor:wait;opacity:0.7;}
+  .btn:hover{border-color:var(--copper);background:#212a4a;}
+  .weather-status{min-height:20px;margin-top:12px;font-size:12px;color:var(--text-on-ink-dim);}
+  .btn.primary{
+    background:var(--copper);
+    border-color:var(--copper);
+    color:var(--ink);
+    font-weight:500;
+  }
+  .btn.primary:hover{background:var(--copper-bright);border-color:var(--copper-bright);}
+
+  /* ---------- Sections ---------- */
+  section.block{
+    padding:38px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .block-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .block-head h2{font-size:21px;}
+  .block-note{font-size:13px;color:var(--text-on-ink-dim);}
+
+  .chart-card{
+    background:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:18px;
+  }
+  .chart-card canvas{display:block;width:100%;height:320px;}
+  #forecastUpdated{font-family:'IBM Plex Mono',monospace;font-size:12px;}
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+  }
+  @media (max-width:760px){.two-col{grid-template-columns:1fr;}}
+
+  .panel{
+    background:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:20px;
+  }
+  .panel h3{font-size:17px;margin-bottom:14px;}
+  .panel .metric-row{
+    display:flex;
+    justify-content:space-between;
+    padding:9px 0;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .panel .metric-row:last-child{border-bottom:none;}
+  .panel .metric-row .v{font-family:'IBM Plex Mono',monospace;color:var(--copper-bright);}
+  .battery-now{padding-bottom:12px;margin-bottom:4px;border-bottom:1px solid var(--line);}
+  .battery-now-head,.battery-soc-label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;}
+  .battery-now-head{margin-bottom:10px;}
+  .battery-action{font-weight:600;}
+  .battery-action.charge{color:var(--gold);}
+  .battery-action.discharge{color:#E0866F;}
+  .battery-action.idle{color:var(--text-on-ink-dim);}
+  .battery-action.depleted{color:#E0866F;}
+  .battery-now progress{display:block;width:100%;height:8px;margin:0 0 6px;accent-color:var(--copper-bright);}
+  .battery-soc-label{color:var(--text-on-ink-dim);font-size:12px;}
+
+  .shed-zone-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    background:rgba(168,68,50,0.18);
+    color:#E0866F;
+    border:1px solid rgba(168,68,50,0.4);
+    border-radius:4px;
+    padding:2px 7px;
+    margin-right:5px;
+  }
+
+  .empty-state{
+    font-size:14px;
+    color:var(--text-on-ink-dim);
+    padding:8px 0;
+  }
+
+  /* ---------- Generative assistant ---------- */
+  .chat-panel{background:var(--ink-soft);border:1px solid var(--line);border-radius:7px;padding:18px;}
+  .chat-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:12px;color:var(--text-on-ink-dim);}
+  .chat-meta .chat-provider{font-family:'IBM Plex Mono',monospace;color:var(--gold);}
+  .chat-transcript{display:flex;flex-direction:column;gap:10px;min-height:220px;max-height:420px;overflow-y:auto;padding:4px 2px 14px;}
+  .chat-message{max-width:min(86%,720px);padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:rgba(246,241,231,0.04);font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;}
+  .chat-message.user{align-self:flex-end;background:rgba(184,112,58,0.16);border-color:rgba(214,138,78,0.32);}
+  .chat-message.assistant{align-self:flex-start;}
+  .chat-composer{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px;border-top:1px solid var(--line);padding-top:14px;}
+  .chat-composer textarea{width:100%;min-height:48px;max-height:140px;resize:vertical;padding:11px 13px;border:1px solid var(--line-strong);border-radius:7px;background:var(--ink);color:var(--text-on-ink);font:14px 'IBM Plex Sans',sans-serif;}
+  .chat-composer textarea:focus{outline:none;border-color:var(--copper);}
+  .chat-notice{min-height:20px;margin-top:8px;font-size:12px;color:var(--text-on-ink-dim);}
+  .chat-notice.error{color:#E0866F;}
+
+  /* ---------- SMS panel ---------- */
+  .sms-panel{
+    background:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:20px;
+    max-width:560px;
+  }
+  .sms-hint{
+    font-size:13px;
+    color:var(--text-on-ink-dim);
+    margin-bottom:16px;
+  }
+  .sms-hint code{
+    background:rgba(255,255,255,0.06);
+    padding:1px 6px;
+    border-radius:4px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+  }
+  .sms-row{display:flex;gap:10px;}
+  .sms-row input[type=text]{
+    flex:1;
+    background:var(--ink);
+    border:1px solid var(--line-strong);
+    border-radius:7px;
+    padding:11px 13px;
+    color:var(--text-on-ink);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+  }
+  .sms-row input[type=text]:focus{outline:none;border-color:var(--copper);}
+  .sms-reply{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:7px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--line);
+    display:none;
+  }
+  .sms-reply.show{display:block;}
+  .sms-reply.err{border-color:rgba(168,68,50,0.4);color:#E0866F;}
+  .sms-reply.ok{border-color:rgba(107,133,88,0.4);color:#9AC28A;}
+
+  /* ---------- Footer ---------- */
+  footer{
+    padding:24px 0 36px;
+  }
+  footer .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .footer-note{font-size:12.5px;color:var(--text-on-ink-dim);max-width:600px;}
+  .api-config{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12.5px;
+    color:var(--text-on-ink-dim);
+  }
+  .api-config input{
+    background:var(--ink-soft);
+    border:1px solid var(--line-strong);
+    border-radius:6px;
+    padding:6px 9px;
+    color:var(--text-on-ink);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    width:210px;
+  }
+
+  @media (max-width:760px){
+    .wrap{padding:0 20px;}
+    header{padding:16px 0;}
+    .hero{padding:36px 0 30px;}
+    .readout{font-size:64px;}
+    .readout-unit{font-size:18px;}
+    section.block{padding:34px 0;}
+    .panel{padding:18px;}
+  }
+
+  @media (max-width:520px){
+    .wrap{padding:0 16px;}
+    header .wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;}
+    .wordmark{font-size:20px;}
+    .conn-status{font-size:11px;padding:6px 8px;}
+    .region-switch{grid-column:1/-1;justify-self:start;max-width:100%;}
+    .region-switch button{min-height:40px;padding:8px 11px;font-size:13px;}
+    .hero{padding:30px 0 24px;}
+    .readout-row{gap:10px;}
+    .readout{font-size:54px;}
+    .readout-unit{font-size:15px;}
+    .status-pill{max-width:100%;padding:7px 10px;border-radius:7px;}
+    .sub-readouts{gap:14px 0;margin-top:20px;}
+    .sub-readout{padding:0 14px;}
+    .sub-readout .value{font-size:18px;}
+    .controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px;margin-top:24px;padding-top:20px;}
+    .control label{gap:4px;font-size:12px;}
+    .checkbox-row{margin-top:0;}
+    .whatif-row .btn{flex:1 1 140px;}
+    section.block{padding:26px 0;}
+    .block-head{align-items:flex-start;}
+    .block-head h2{font-size:20px;}
+    .chart-card{padding:8px;}
+    .chart-card canvas{height:260px;}
+    .panel,.sms-panel{padding:16px;}
+    .controls{grid-template-columns:1fr;}
+    .sms-row{align-items:stretch;}
+    .sms-row .btn{padding:9px 13px;}
+    .chat-panel{padding:14px;}
+    .chat-transcript{min-height:180px;}
+    .chat-message{max-width:94%;}
+    .chat-composer{grid-template-columns:1fr;}
+    .chat-composer .btn{justify-self:end;}
+    footer .wrap,.api-config{align-items:flex-start;}
+    .api-config{flex-wrap:wrap;}
+    .api-config input{width:min(100%,280px);}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{scroll-behavior:auto!important;animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="wordmark">Nyika<span>-Grid</span></div>
+    <div class="region-switch" id="regionSwitch"></div>
+    <div class="conn-status"><span class="conn-dot" id="connDot"></span><span id="connLabel">Checking API…</span></div>
+  </div>
+</header>
+
+<section class="hero">
+  <svg class="grid-motif" width="100%" height="100%" preserveAspectRatio="none">
+    <defs>
+      <pattern id="gridPattern" width="64" height="64" patternUnits="userSpaceOnUse">
+        <path d="M 64 0 L 0 0 0 64" fill="none" stroke="rgba(246,241,231,0.05)" stroke-width="1"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#gridPattern)"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-region-label" id="heroRegionLabel">Loading region…</div>
+    <div class="readout-row">
+      <div class="readout" id="netLoadReadout">—</div>
+      <div class="readout-unit">MW net load</div>
+    </div>
+    <div class="status-pill" id="statusPill">Checking…</div>
+
+    <div class="sub-readouts">
+      <div class="sub-readout">
+        <div class="label">Grid load</div>
+        <div class="value" id="rawLoadValue">— MW</div>
+      </div>
+      <div class="sub-readout solar">
+        <div class="label">Solar generation</div>
+        <div class="value" id="solarValue">— MW</div>
+      </div>
+      <div class="sub-readout">
+        <div class="label">Hour</div>
+        <div class="value" id="hourValue">—</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="control">
+        <label>Hour of day <span class="val" id="hourLabel">19</span></label>
+        <input type="range" id="hourSlider" min="0" max="23" value="19">
+      </div>
+      <div class="control">
+        <label>Temperature <span class="val" id="tempLabel">30°C</span></label>
+        <input type="range" id="tempSlider" min="15" max="42" value="30">
+      </div>
+      <div class="control">
+        <label>Cloud cover <span class="val" id="cloudLabel">20%</span></label>
+        <input type="range" id="cloudSlider" min="0" max="100" value="20">
+      </div>
+      <div class="control">
+        <div class="checkbox-row" style="margin-top:22px;">
+          <input type="checkbox" id="weekendCheck">
+          <label style="margin:0;" for="weekendCheck">Weekend</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="whatif-row">
+      <button class="btn" id="btnHeatwave">🔥 Heatwave (+5°C)</button>
+      <button class="btn" id="btnCloudy">☁️ Cloudy day (+60%)</button>
+      <button class="btn" id="btnWeather">Live weather</button>
+      <button class="btn primary" id="btnRefresh">Refresh forecast</button>
+    </div>
+    <div class="weather-status" id="weatherStatus" aria-live="polite">Waiting for region data…</div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>24-hour outlook</h2>
+      <div class="block-note">Held at the current temperature, cloud cover, and day type <span id="forecastUpdated" aria-live="polite"></span></div>
+    </div>
+    <div class="chart-card">
+      <canvas id="forecastChart" height="90"></canvas>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>Recommendations</h2>
+      <div class="block-note">Turning the forecast into what to actually do</div>
+    </div>
+    <div class="two-col">
+      <div class="panel">
+        <h3>🔌 Load-shedding plan</h3>
+        <div id="sheddingContent"><div class="empty-state">Loading…</div></div>
+      </div>
+      <div class="panel">
+        <h3>🔋 Battery plan</h3>
+        <div class="battery-setting">
+          <label for="initialSocSlider">Starting charge <span class="val" id="initialSocLabel">50%</span></label>
+          <input type="range" id="initialSocSlider" min="0" max="100" step="5" value="50">
+        </div>
+        <div id="batteryContent"><div class="empty-state">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="assistantSection">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>Nyika-Grid Assistant</h2>
+      <div class="block-note">Ask about current forecasts and recommendations</div>
+    </div>
+    <div class="chat-panel">
+      <div class="chat-meta">
+        <span class="chat-provider" id="chatProviderStatus">Checking model…</span>
+        <span id="chatContextLabel">Live system context</span>
+      </div>
+      <div class="chat-transcript" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions text">
+        <div class="chat-message assistant">Ask about the selected region’s forecast, load-shedding outlook, or battery plan.</div>
+      </div>
+      <form class="chat-composer" id="chatForm">
+        <textarea id="chatInput" rows="2" maxlength="2000" placeholder="Ask about the current system…" aria-label="Message the Nyika-Grid Assistant" required></textarea>
+        <button class="btn primary" id="chatSend" type="submit" disabled>Send</button>
+      </form>
+      <div class="chat-notice" id="chatNotice" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>Text-message access</h2>
+      <div class="block-note">The same forecasts, for basic phones without an app or browser</div>
+    </div>
+    <div class="sms-panel">
+      <div class="sms-hint">
+        Try <code>HELP</code>, <code>STATUS &lt;region&gt;</code>, or <code>LOAD &lt;region&gt; &lt;hour&gt;</code>
+      </div>
+      <div class="sms-row">
+        <input type="text" id="smsInput" placeholder="Type a command…">
+        <button class="btn primary" id="smsSend">Send</button>
+      </div>
+      <div class="sms-reply" id="smsReply"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-note">
+      Trained on simulated data for demonstration. Predictions are illustrative only —
+      retrain on real ZESCO / weather data before operational use.
+    </div>
+    <div class="api-config">
+      API base:
+      <input type="text" id="apiBaseInput" value="http://127.0.0.1:8000">
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  let REGIONS = [];
+
+  const state = {
+    apiBase: document.getElementById("apiBaseInput").value.trim(),
+    region: null,
+    hour: new Date().getHours(),
+    temperature: Number(document.getElementById("tempSlider").value),
+    cloud: Number(document.getElementById("cloudSlider").value),
+    initialSoc: Number(document.getElementById("initialSocSlider").value),
+    weekend: [0, 6].includes(new Date().getDay()),
+    apiOnline: false
+  };
+
+  let chart = null;
+  let latestForecast = null;
+  let chartResizeObserver = null;
+  let refreshTimer = null;
+  let connectionRequestId = 0;
+  let forecastRequestId = 0;
+  let sheddingRequestId = 0;
+  let batteryRequestId = 0;
+  let refreshRequestId = 0;
+  let weatherRequestId = 0;
+  let chatStatusRequestId = 0;
+  let chatRequestId = 0;
+  let chatProviderAvailable = false;
+  let chatHistory = [];
+
+  // ---------- DOM refs ----------
+  const el = {
+    regionSwitch: document.getElementById("regionSwitch"),
+    connDot: document.getElementById("connDot"),
+    connLabel: document.getElementById("connLabel"),
+    heroRegionLabel: document.getElementById("heroRegionLabel"),
+    netLoadReadout: document.getElementById("netLoadReadout"),
+    statusPill: document.getElementById("statusPill"),
+    forecastUpdated: document.getElementById("forecastUpdated"),
+    rawLoadValue: document.getElementById("rawLoadValue"),
+    solarValue: document.getElementById("solarValue"),
+    hourValue: document.getElementById("hourValue"),
+    hourSlider: document.getElementById("hourSlider"),
+    hourLabel: document.getElementById("hourLabel"),
+    tempSlider: document.getElementById("tempSlider"),
+    tempLabel: document.getElementById("tempLabel"),
+    cloudSlider: document.getElementById("cloudSlider"),
+    cloudLabel: document.getElementById("cloudLabel"),
+    initialSocSlider: document.getElementById("initialSocSlider"),
+    initialSocLabel: document.getElementById("initialSocLabel"),
+    weekendCheck: document.getElementById("weekendCheck"),
+    btnHeatwave: document.getElementById("btnHeatwave"),
+    btnCloudy: document.getElementById("btnCloudy"),
+    btnWeather: document.getElementById("btnWeather"),
+    btnRefresh: document.getElementById("btnRefresh"),
+    weatherStatus: document.getElementById("weatherStatus"),
+    sheddingContent: document.getElementById("sheddingContent"),
+    batteryContent: document.getElementById("batteryContent"),
+    smsInput: document.getElementById("smsInput"),
+    smsSend: document.getElementById("smsSend"),
+    smsReply: document.getElementById("smsReply"),
+    chatProviderStatus: document.getElementById("chatProviderStatus"),
+    chatContextLabel: document.getElementById("chatContextLabel"),
+    chatMessages: document.getElementById("chatMessages"),
+    chatForm: document.getElementById("chatForm"),
+    chatInput: document.getElementById("chatInput"),
+    chatSend: document.getElementById("chatSend"),
+    chatNotice: document.getElementById("chatNotice"),
+    apiBaseInput: document.getElementById("apiBaseInput"),
+  };
+
+  // ---------- Region switch ----------
+  function renderRegionSwitch(){
+    el.regionSwitch.innerHTML = "";
+    REGIONS.forEach(r => {
+      const btn = document.createElement("button");
+      btn.textContent = r.label.replace(" Grid","").replace(" Mini-Grid"," Mini-Grid");
+      btn.dataset.key = r.key;
+      if(r.key === state.region) btn.classList.add("active");
+      btn.addEventListener("click", () => {
+        state.region = r.key;
+        renderRegionSwitch();
+        refreshAll();
+        refreshLiveWeather();
+        refreshChatStatus();
+      });
+      el.regionSwitch.appendChild(btn);
+    });
+  }
+
+  function regionLabel(key){
+    const r = REGIONS.find(x => x.key === key);
+    return r ? r.label : key;
+  }
+
+  async function loadRegions(){
+    const data = await apiGet("/regions");
+    REGIONS = Object.entries(data).map(([key, config]) => ({
+      key,
+      label: config.label,
+      alertThreshold: config.alert_threshold_mw
+    }));
+    if(REGIONS.length === 0) throw new Error("No regions are configured.");
+    if(!REGIONS.some(region => region.key === state.region)) state.region = REGIONS[0].key;
+    renderRegionSwitch();
+  }
+
+  // ---------- API helpers ----------
+  async function apiGet(path){
+    const res = await fetch(state.apiBase + path);
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  }
+  async function apiPost(path, body){
+    const res = await fetch(state.apiBase + path, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(body)
+    });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  }
+
+  async function checkConnection(){
+    const requestId = ++connectionRequestId;
+    try{
+      await apiGet("/regions");
+      if(requestId !== connectionRequestId) return state.apiOnline;
+      state.apiOnline = true;
+      el.connDot.classList.remove("offline");
+      el.connLabel.textContent = "API connected";
+    }catch(e){
+      if(requestId !== connectionRequestId) return state.apiOnline;
+      state.apiOnline = false;
+      el.connDot.classList.add("offline");
+      el.connLabel.textContent = "API unreachable — start uvicorn and check the API base below";
+    }
+    return state.apiOnline;
+  }
+
+  async function refreshLiveWeather(){
+    if(!state.region) return;
+    const requestId = ++weatherRequestId;
+    const regionKey = state.region;
+    el.btnWeather.disabled = true;
+    el.weatherStatus.textContent = `Fetching live conditions for ${regionLabel(regionKey)}…`;
+    try{
+      const data = await apiGet(`/weather/live?region=${encodeURIComponent(regionKey)}`);
+      if(requestId !== weatherRequestId || regionKey !== state.region) return;
+      if(!data.success){
+        el.weatherStatus.textContent = "Live weather unavailable; adjust the conditions manually.";
+        return;
+      }
+      state.temperature = Math.max(Number(el.tempSlider.min), Math.min(Number(el.tempSlider.max), Math.round(data.temperature_c)));
+      state.cloud = Math.max(Number(el.cloudSlider.min), Math.min(Number(el.cloudSlider.max), Math.round(data.cloud_cover_pct)));
+      el.tempSlider.value = state.temperature;
+      el.tempLabel.textContent = state.temperature + "°C";
+      el.cloudSlider.value = state.cloud;
+      el.cloudLabel.textContent = state.cloud + "%";
+      el.weatherStatus.textContent = `Live weather · ${regionLabel(regionKey)} · ${state.temperature}°C · ${state.cloud}% cloud`;
+      await refreshAll();
+    }catch(e){
+      if(requestId === weatherRequestId) el.weatherStatus.textContent = "Live weather unavailable; adjust the conditions manually.";
+    }finally{
+      if(requestId === weatherRequestId) el.btnWeather.disabled = false;
+    }
+  }
+
+  // ---------- Hero + chart ----------
+  async function refreshForecast(){
+    const requestId = ++forecastRequestId;
+    el.heroRegionLabel.textContent = regionLabel(state.region);
+    el.hourValue.textContent = state.hour + ":00";
+
+    const month = new Date().getMonth() + 1;
+    const qs = `?region=${encodeURIComponent(state.region)}&temperature_c=${state.temperature}&is_weekend=${state.weekend?1:0}&cloud_cover_pct=${state.cloud}&month=${month}`;
+
+    let data;
+    try{
+      data = await apiGet("/forecast/24h" + qs);
+    }catch(e){
+      if(requestId !== forecastRequestId) return;
+      el.netLoadReadout.textContent = "—";
+      el.statusPill.textContent = "API unreachable";
+      return;
+    }
+    if(requestId !== forecastRequestId) return;
+
+    const idx = data.hours.indexOf(state.hour);
+    const load = data.load_mw[idx];
+    const solar = data.solar_mw[idx];
+    const net = data.net_load_mw[idx];
+    const threshold = data.alert_threshold_mw;
+
+    el.netLoadReadout.textContent = net.toFixed(0);
+    el.rawLoadValue.textContent = load.toFixed(1) + " MW";
+    el.solarValue.textContent = solar.toFixed(1) + " MW";
+
+    const atRisk = load >= threshold;
+    el.netLoadReadout.classList.toggle("at-risk", atRisk);
+    el.statusPill.classList.toggle("at-risk", atRisk);
+    el.statusPill.textContent = atRisk
+      ? `⚠ Elevated risk — load above ${threshold.toFixed(0)} MW threshold`
+      : `✓ Stable — within ${threshold.toFixed(0)} MW threshold`;
+
+    latestForecast = data;
+    el.forecastUpdated.textContent = " · Updated " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    renderChart(data);
+  }
+
+  function renderChart(data){
+    const canvas = document.getElementById("forecastChart");
+    const ctx = canvas.getContext("2d");
+    const labels = data.hours.map(h => h + ":00");
+
+    if(chart){
+      chart.destroy();
+      chart = null;
+    }
+    if(typeof Chart === "undefined"){
+      if(!chartResizeObserver && "ResizeObserver" in window){
+        chartResizeObserver = new ResizeObserver(() => {
+          if(latestForecast) renderFallbackChart(canvas, canvas.getContext("2d"), latestForecast);
+        });
+        chartResizeObserver.observe(canvas.parentElement);
+      }
+      renderFallbackChart(canvas, ctx, data);
+      return;
+    }
+
+    chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          { label: "Grid load", data: data.load_mw, borderColor: "#D68A4E", backgroundColor: "transparent", tension: 0.3 },
+          { label: "Solar generation", data: data.solar_mw, borderColor: "#E3A857", backgroundColor: "transparent", tension: 0.3 },
+          { label: "Net load", data: data.net_load_mw, borderColor: "#F2EEE4", backgroundColor: "transparent", borderDash: [4,3], tension: 0.3 },
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          x: { ticks: { color: "#B9C0D6" }, grid: { color: "rgba(246,241,231,0.06)" } },
+          y: { ticks: { color: "#B9C0D6" }, grid: { color: "rgba(246,241,231,0.06)" }, title: { display: true, text: "MW", color: "#B9C0D6" } }
+        },
+        plugins: {
+          legend: { labels: { color: "#F2EEE4" } }
+        }
+      }
+    });
+  }
+
+  function renderFallbackChart(canvas, ctx, data){
+    if(!ctx) return;
+
+    const width = Math.max(canvas.clientWidth, 1);
+    const height = Math.max(canvas.clientHeight, 220);
+    const pixelRatio = window.devicePixelRatio || 1;
+    canvas.width = Math.round(width * pixelRatio);
+    canvas.height = Math.round(height * pixelRatio);
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", "24-hour forecast of grid load, solar generation, and net load");
+
+    const compact = width < 460;
+    const padding = { top: compact ? 62 : 48, right: 16, bottom: 34, left: 48 };
+    const plotWidth = width - padding.left - padding.right;
+    const plotHeight = height - padding.top - padding.bottom;
+    const maximum = Math.max(...data.load_mw, ...data.solar_mw, ...data.net_load_mw, 1);
+    const scaleMaximum = Math.ceil(maximum / 50) * 50;
+    const series = [
+      { values: data.load_mw, color: "#D68A4E", label: "Grid load" },
+      { values: data.solar_mw, color: "#E3A857", label: "Solar generation" },
+      { values: data.net_load_mw, color: "#F2EEE4", label: "Net load", dashed: true }
+    ];
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.font = "11px 'IBM Plex Mono', monospace";
+    ctx.textBaseline = "middle";
+    series.forEach((item, index) => {
+      const columns = compact ? 2 : 3;
+      const x = compact ? 8 + (index % columns) * ((width - 16) / columns) : padding.left + index * 148;
+      const y = compact ? 12 + Math.floor(index / columns) * 19 : 16;
+      ctx.strokeStyle = item.color;
+      ctx.fillStyle = item.color;
+      ctx.setLineDash(item.dashed ? [4, 3] : []);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 18, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillText(item.label, x + 24, y);
+    });
+
+    ctx.strokeStyle = "rgba(246,241,231,0.12)";
+    ctx.fillStyle = "#B9C0D6";
+    ctx.textAlign = "right";
+    for(let step = 0; step <= 4; step++){
+      const value = scaleMaximum * (1 - step / 4);
+      const y = padding.top + plotHeight * step / 4;
+      ctx.beginPath();
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(width - padding.right, y);
+      ctx.stroke();
+      ctx.fillText(String(Math.round(value)), padding.left - 8, y);
+    }
+
+    ctx.textAlign = "center";
+    data.hours.forEach((hour, index) => {
+      const tickInterval = compact ? 6 : 3;
+      if(hour % tickInterval !== 0 && index !== data.hours.length - 1) return;
+      const x = padding.left + plotWidth * index / Math.max(data.hours.length - 1, 1);
+      ctx.fillText(hour + ":00", x, height - 14);
+    });
+
+    series.forEach(item => {
+      ctx.strokeStyle = item.color;
+      ctx.lineWidth = 2;
+      ctx.setLineDash(item.dashed ? [5, 4] : []);
+      ctx.beginPath();
+      item.values.forEach((value, index) => {
+        const x = padding.left + plotWidth * index / Math.max(item.values.length - 1, 1);
+        const y = padding.top + plotHeight * (1 - value / scaleMaximum);
+        if(index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+  }
+
+  // ---------- Recommendations ----------
+  async function refreshShedding(){
+    const requestId = ++sheddingRequestId;
+    el.sheddingContent.innerHTML = '<div class="empty-state">Loading…</div>';
+    try{
+      const data = await apiPost("/shedding/schedule", {
+        region: state.region, temperature_c: state.temperature, is_weekend: state.weekend ? 1 : 0
+      });
+      if(requestId !== sheddingRequestId) return;
+      if(data.summary.total_hours_with_shedding === 0){
+        el.sheddingContent.innerHTML = '<div class="empty-state">✅ No shedding needed under these conditions.</div>';
+        return;
+      }
+      let html = `<div class="metric-row"><span>Hours affected</span><span class="v">${data.summary.total_hours_with_shedding}</span></div>`;
+      html += `<div class="metric-row"><span>Peak deficit</span><span class="v">${data.summary.peak_deficit_mw} MW</span></div>`;
+      const shedHours = data.schedule.filter(s => s.zones_to_shed.length > 0).slice(0, 6);
+      html += '<div style="margin-top:12px;">';
+      shedHours.forEach(s => {
+        html += `<div style="margin-bottom:6px;font-size:13px;">${s.hour}:00 — ${s.zones_to_shed.map(z => `<span class="shed-zone-tag">Zone ${z}</span>`).join(" ")}</div>`;
+      });
+      html += '</div>';
+      el.sheddingContent.innerHTML = html;
+    }catch(e){
+      if(requestId === sheddingRequestId) el.sheddingContent.innerHTML = '<div class="empty-state">Could not load shedding plan.</div>';
+    }
+  }
+
+  async function refreshBattery(){
+    const requestId = ++batteryRequestId;
+    el.batteryContent.innerHTML = '<div class="empty-state">Loading…</div>';
+    try{
+      const data = await apiPost("/battery/schedule", {
+        region: state.region, temperature_c: state.temperature, is_weekend: state.weekend ? 1 : 0,
+        cloud_cover_pct: state.cloud, month: new Date().getMonth() + 1, initial_soc_frac: state.initialSoc / 100
+      });
+      if(requestId !== batteryRequestId) return;
+      if(data.battery_capacity_mwh <= 0){
+        el.batteryContent.innerHTML = '<div class="empty-state">No battery storage configured for this region.</div>';
+        return;
+      }
+      const currentHour = data.schedule.find(entry => entry.hour === state.hour);
+      const currentAction = currentHour.action === "idle" && currentHour.unmet_deficit_mw > 0
+        ? "depleted"
+        : currentHour.action;
+      const actionLabel = currentAction === "charge" ? "Charging"
+        : currentAction === "discharge" ? "Discharging"
+        : currentAction === "depleted" ? "Battery depleted"
+        : "Idle";
+      let html = `<div class="battery-now">
+        <div class="battery-now-head"><span>Plan at ${state.hour}:00</span><span class="battery-action ${currentAction}">${actionLabel}</span></div>
+        <progress max="100" value="${currentHour.soc_pct}" aria-label="Battery state of charge at ${state.hour}:00"></progress>
+        <div class="battery-soc-label"><span>Stored energy</span><span>${currentHour.soc_mwh.toFixed(2)} / ${data.battery_capacity_mwh} MWh (${currentHour.soc_pct}%)</span></div>
+        <div class="metric-row"><span>Unmet demand at ${state.hour}:00</span><span class="v">${currentHour.unmet_deficit_mw.toFixed(1)} MW</span></div>
+      </div>`;
+      html += `<div class="metric-row"><span>Battery capacity</span><span class="v">${data.battery_capacity_mwh} MWh</span></div>`;
+      html += `<div class="metric-row"><span>Hours not fully covered</span><span class="v">${data.summary.hours_battery_could_not_cover}</span></div>`;
+      html += `<div class="metric-row"><span>Max unmet deficit</span><span class="v">${data.summary.max_unmet_deficit_mw} MW</span></div>`;
+      el.batteryContent.innerHTML = html;
+    }catch(e){
+      if(requestId === batteryRequestId) el.batteryContent.innerHTML = '<div class="empty-state">Could not load battery plan.</div>';
+    }
+  }
+
+  // ---------- SMS ----------
+  async function sendSms(){
+    const text = el.smsInput.value.trim();
+    if(!text) return;
+    el.smsReply.className = "sms-reply show";
+    el.smsReply.textContent = "Sending…";
+    try{
+      const data = await apiPost("/sms/query", { text: text });
+      el.smsReply.className = "sms-reply show " + (data.success ? "ok" : "err");
+      el.smsReply.textContent = data.reply;
+    }catch(e){
+      el.smsReply.className = "sms-reply show err";
+      el.smsReply.textContent = "Could not reach the API.";
+    }
+  }
+
+  function appendChatMessage(role, content){
+    const message = document.createElement("div");
+    message.className = `chat-message ${role}`;
+    message.textContent = content;
+    el.chatMessages.appendChild(message);
+    el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
+  }
+
+  async function refreshChatStatus(){
+    const requestId = ++chatStatusRequestId;
+    el.chatProviderStatus.textContent = "Checking model…";
+    el.chatSend.disabled = true;
+    try{
+      const status = await apiGet("/chat/status");
+      if(requestId !== chatStatusRequestId) return;
+      chatProviderAvailable = Boolean(status.available);
+      el.chatProviderStatus.textContent = status.available
+        ? `${status.provider} · ${status.model}`
+        : `Not configured · ${status.provider || "model"}`;
+      el.chatContextLabel.textContent = state.region
+        ? `Live context · ${regionLabel(state.region)}`
+        : "Live system context";
+      el.chatNotice.classList.toggle("error", !status.available);
+      el.chatNotice.textContent = status.message || "";
+      el.chatSend.disabled = !chatProviderAvailable;
+    }catch(e){
+      if(requestId !== chatStatusRequestId) return;
+      chatProviderAvailable = false;
+      el.chatProviderStatus.textContent = "Model status unavailable";
+      el.chatNotice.textContent = "Could not check the chat provider. Verify the API connection.";
+      el.chatNotice.classList.add("error");
+      el.chatSend.disabled = true;
+    }
+  }
+
+  async function sendChat(event){
+    event.preventDefault();
+    const content = el.chatInput.value.trim();
+    if(!content || !chatProviderAvailable || !state.region) return;
+
+    const requestId = ++chatRequestId;
+    const context = {
+      region: state.region,
+      hour: state.hour,
+      temperature_c: state.temperature,
+      is_weekend: state.weekend ? 1 : 0,
+      cloud_cover_pct: state.cloud,
+      month: new Date().getMonth() + 1,
+      initial_soc_frac: state.initialSoc / 100,
+      use_custom: false
+    };
+    chatHistory.push({ role: "user", content });
+    chatHistory = chatHistory.slice(-10);
+    appendChatMessage("user", content);
+    el.chatInput.value = "";
+    el.chatSend.disabled = true;
+    el.chatNotice.classList.remove("error");
+    el.chatNotice.textContent = "Generating response from current system context…";
+    el.chatContextLabel.textContent = `Context · ${regionLabel(context.region)} · ${context.hour}:00`;
+
+    try{
+      const result = await apiPost("/chat", { ...context, messages: chatHistory });
+      if(requestId !== chatRequestId) return;
+      appendChatMessage("assistant", result.reply);
+      chatHistory.push({ role: "assistant", content: result.reply });
+      chatHistory = chatHistory.slice(-10);
+      el.chatNotice.textContent = `${result.provider} · ${result.model}`;
+    }catch(e){
+      if(requestId !== chatRequestId) return;
+      el.chatNotice.classList.add("error");
+      el.chatNotice.textContent = "The model could not answer. Check provider setup and try again.";
+      await refreshChatStatus();
+    }finally{
+      if(requestId === chatRequestId && chatProviderAvailable) el.chatSend.disabled = false;
+    }
+  }
+
+  // ---------- Controls wiring ----------
+  function wireControls(){
+    el.hourSlider.addEventListener("input", () => {
+      state.hour = parseInt(el.hourSlider.value, 10);
+      el.hourLabel.textContent = state.hour;
+      queueRefresh();
+    });
+    el.tempSlider.addEventListener("input", () => {
+      state.temperature = parseInt(el.tempSlider.value, 10);
+      el.tempLabel.textContent = state.temperature + "°C";
+      queueRefresh();
+    });
+
+    el.cloudSlider.addEventListener("input", () => {
+      state.cloud = parseInt(el.cloudSlider.value, 10);
+      el.cloudLabel.textContent = state.cloud + "%";
+      queueRefresh();
+    });
+
+    el.weekendCheck.addEventListener("change", () => {
+      state.weekend = el.weekendCheck.checked;
+      refreshAll();
+    });
+
+    el.btnHeatwave.addEventListener("click", () => {
+      state.temperature = Math.min(42, state.temperature + 5);
+      el.tempSlider.value = state.temperature;
+      el.tempLabel.textContent = state.temperature + "°C";
+      refreshAll();
+    });
+    el.btnCloudy.addEventListener("click", () => {
+      state.cloud = Math.min(100, state.cloud + 60);
+      el.cloudSlider.value = state.cloud;
+      el.cloudLabel.textContent = state.cloud + "%";
+      refreshAll();
+    });
+    el.btnWeather.addEventListener("click", refreshLiveWeather);
+    el.initialSocSlider.addEventListener("input", () => {
+      state.initialSoc = Number(el.initialSocSlider.value);
+      el.initialSocLabel.textContent = state.initialSoc + "%";
+      queueRefresh();
+    });
+    el.btnRefresh.addEventListener("click", refreshAll);
+
+    el.smsSend.addEventListener("click", sendSms);
+    el.smsInput.addEventListener("keydown", (ev) => { if(ev.key === "Enter") sendSms(); });
+    el.chatForm.addEventListener("submit", sendChat);
+    el.chatInput.addEventListener("keydown", (ev) => {
+      if(ev.key === "Enter" && !ev.shiftKey){
+        ev.preventDefault();
+        el.chatForm.requestSubmit();
+      }
+    });
+
+    el.apiBaseInput.addEventListener("change", () => {
+      state.apiBase = el.apiBaseInput.value.trim().replace(/\/$/, "");
+      refreshAll();
+      refreshChatStatus();
+    });
+  }
+
+  // ---------- Orchestration ----------
+  function queueRefresh(){
+    window.clearTimeout(refreshTimer);
+    refreshTimer = window.setTimeout(refreshAll, 180);
+  }
+
+  async function refreshAll(){
+    const requestId = ++refreshRequestId;
+    el.btnRefresh.disabled = true;
+    el.btnRefresh.setAttribute("aria-busy", "true");
+    el.btnRefresh.textContent = "Updating…";
+    try{
+      const online = await checkConnection();
+      if(requestId !== refreshRequestId || !online) return;
+      await Promise.all([refreshForecast(), refreshShedding(), refreshBattery()]);
+    }finally{
+      if(requestId === refreshRequestId){
+        el.btnRefresh.disabled = false;
+        el.btnRefresh.removeAttribute("aria-busy");
+        el.btnRefresh.textContent = "Refresh forecast";
+      }
+    }
+  }
+
+  async function init(){
+    state.hour = new Date().getHours();
+    state.weekend = [0, 6].includes(new Date().getDay());
+    el.hourSlider.value = state.hour;
+    el.hourLabel.textContent = state.hour;
+    el.weekendCheck.checked = state.weekend;
+    try{
+      await loadRegions();
+    }catch(e){
+      el.connDot.classList.add("offline");
+      el.connLabel.textContent = "API unreachable — start uvicorn and check the API base below";
+      el.regionSwitch.textContent = "No region data available";
+      el.weatherStatus.textContent = "Connect to the API to load forecasts.";
+      el.btnWeather.disabled = true;
+      el.btnRefresh.disabled = true;
+      return;
+    }
+    wireControls();
+    refreshChatStatus();
+    await refreshAll();
+    refreshLiveWeather();
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+
+</body>
+</html>
