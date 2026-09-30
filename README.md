@@ -1,8 +1,12 @@
-# Nyika-Grid Predict AI — Prototype (v6)
+# Nyika-Grid Predict AI
 
-A working, fully-tested prototype forecasting electricity grid load **and solar generation** in Zambia, across multiple regions, with alerting (including real webhook delivery), accuracy tracking, real-data retraining, drought stress-testing, multi-language SMS access, plan-vs-reality execution tracking, a regional map, one-click stakeholder PDF reports, and a live dashboard plus standalone web frontend.
+**A Zambia-focused prototype for forecasting electricity demand and solar generation.** It includes regional forecasts, planning tools, alerting, a Streamlit operations dashboard, a FastAPI backend, and a standalone web frontend.
 
-> ⚠️ Trained on **simulated data by default** — see "Upload & Retrain." See `MODEL_CARD.md` for a full, honest account of this project's limitations.
+`Python 3.11+` · `FastAPI` · `Streamlit` · [GPL-3.0-only](LICENSE)
+
+> **Prototype notice:** Demo models use simulated data by default. This project is not connected to ZESCO, utility telemetry, or grid-control equipment, and its recommendations are not dispatch instructions. Read the [model card](MODEL_CARD.md) before using or presenting its outputs.
+
+**Contents:** [Capabilities](#whats-included) · [Project status](#project-purpose-and-current-status) · [Local setup](#local-setup) · [API](#step-2-run-the-api-optional-for-backend-testing) · [Next steps](#next-steps) · [License](#license)
 
 ---
 
@@ -393,3 +397,7 @@ Every module here was executed and verified, not just syntax-checked:
 - Upgrade the map from approximate region centers to real per-site markers once GPS-tagged multi-site data is available
 - Wire `alerts.py`'s SMS/email dispatch to a real provider (webhook delivery is already real; SMS/email is still simulated)
 - Replace `impact.py`'s estimated diesel cost/CO2 constants with real site-specific figures once available
+
+## License
+
+Project code is licensed under the GNU General Public License, version 3.0 only. See [LICENSE](LICENSE) for the full terms. The bundled DejaVu fonts are provided under separate terms; see [fonts/LICENSE-DejaVu.txt](fonts/LICENSE-DejaVu.txt). Third-party dependencies retain their respective licenses.
