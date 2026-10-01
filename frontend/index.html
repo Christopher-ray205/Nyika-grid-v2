@@ -9,20 +9,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#111821;
-    --ink-soft:#1A242E;
-    --paper:#F6F1E7;
-    --paper-dim:#EAE3D3;
-    --copper:#B8703A;
-    --copper-bright:#D68A4E;
-    --gold:#E3A857;
-    --earth:#A84432;
-    --savanna:#8EAC70;
-    --text-on-ink:#F2EEE4;
-    --text-on-ink-dim:#B8C1C7;
-    --line:rgba(246,241,231,0.12);
-    --line-strong:rgba(246,241,231,0.24);
-    --focus:#F0B45F;
+    --ink:#12392E;
+    --ink-soft:#1C4739;
+    --paper:#F4F7F4;
+    --paper-dim:#E4ECE7;
+    --copper:#D46A42;
+    --copper-bright:#E4875F;
+    --gold:#E6B955;
+    --earth:#B5483D;
+    --savanna:#95C6A2;
+    --text-on-ink:#F4F7F4;
+    --text-on-ink-dim:#B7C9BF;
+    --line:rgba(18,57,46,0.12);
+    --line-strong:rgba(18,57,46,0.24);
+    --focus:#E6B955;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -494,10 +494,90 @@
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{scroll-behavior:auto!important;animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
   }
+
+  body{background:var(--paper);color:var(--ink);}
+  header{background:rgba(250,252,250,0.96);border-color:var(--line);box-shadow:0 1px 0 rgba(18,57,46,0.03);}
+  .wordmark{color:var(--ink);}
+  .region-switch{background:#EDF2EE;border-color:var(--line);}
+  .region-switch button{color:#547066;}
+  .region-switch button.active{background:var(--ink);color:#F4F7F4;}
+  .conn-status{background:#F4F7F4;color:#547066;border-color:var(--line);}
+  .hero{--line:rgba(244,247,244,0.14);background:#12392E;padding:54px 0 42px;}
+  .grid-motif{opacity:0.32;}
+  .hero-region-label{letter-spacing:0.08em;font-weight:600;}
+  .readout{font-size:clamp(68px,8vw,96px);font-weight:500;color:#E6B955;}
+  .status-pill{background:rgba(149,198,162,0.12);color:#A9D8B4;border-color:rgba(149,198,162,0.26);}
+  .status-pill.at-risk{background:rgba(229,122,96,0.13);color:#F09A7E;border-color:rgba(229,122,96,0.36);}
+  .controls{grid-template-columns:repeat(4,minmax(0,1fr));gap:26px;padding-top:26px;}
+  .control label{letter-spacing:0.01em;}
+  input[type=range]{accent-color:var(--gold);}
+  input[type=checkbox]{accent-color:var(--copper);}
+  .btn{border-radius:5px;}
+  .btn:hover{border-color:var(--copper-bright);background:#234B3B;}
+  .btn.primary{background:var(--copper);border-color:var(--copper);color:#fff;}
+  .btn.primary:hover{background:var(--copper-bright);border-color:var(--copper-bright);}
+  section.block{padding:40px 0;border-color:var(--line);}
+  .block-head h2{color:var(--ink);font-size:23px;}
+  .block-note{color:#63786E;}
+  .chart-card,.panel,.chat-panel,.sms-panel{background:#FBFCFB;border-color:#DCE5DF;box-shadow:0 8px 24px rgba(18,57,46,0.035);}
+  .chart-card{padding:20px;}
+  .panel h3{color:var(--ink);}
+  .panel .metric-row{border-color:#E5EBE7;}
+  .panel .metric-row .v{color:#B95D3D;}
+  .empty-state,.weather-status,.footer-note,.api-config,.chat-meta,.chat-notice{color:#63786E;}
+  .battery-now{border-color:#E5EBE7;}
+  .battery-soc-label{color:#63786E;}
+  .shed-zone-tag{background:#FBEEEA;color:#A94E39;border-color:#EBC7BA;}
+  .chat-message{background:#F2F6F3;border-color:#DFE8E2;color:var(--ink);}
+  .chat-message.user{background:#FCEEE8;border-color:#F0C7B8;}
+  .chat-composer textarea,.sms-row input[type=text],.api-config input{background:#fff;color:var(--ink);border-color:#CAD8CF;}
+  .sms-reply{background:#F2F6F3;border-color:#DFE8E2;}
+  .sms-reply.ok{border-color:#B9D7C0;color:#2B704B;}
+  .sms-reply.err,.chat-notice.error{color:#A94337;}
+  footer{background:#EAF0EC;}
+  .api-config input{width:250px;}
+  @media (max-width:760px){
+    .hero{padding:42px 0 34px;}
+    .controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;}
+    section.block{padding:32px 0;}
+  }
+  @media (max-width:520px){
+    .hero{padding:34px 0 28px;}
+    .readout{font-size:56px;}
+    .controls{grid-template-columns:1fr;gap:16px;}
+    .chart-card{padding:10px;}
+  }
+
+  .wrap{max-width:1240px;}
+  .hero{padding:50px 0 38px;}
+  .hero-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px;}
+  .local-clock{font:12px 'IBM Plex Mono',monospace;color:#C0D3C8;white-space:nowrap;}
+  .readout{font-size:84px;}
+  .forecast-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-bottom:14px;background:#DCE5DF;border:1px solid #DCE5DF;border-radius:5px;overflow:hidden;}
+  .forecast-stat{min-width:0;padding:14px 16px;background:#FBFCFB;}
+  .forecast-stat span,.forecast-stat small{display:block;color:#63786E;font-size:11px;}
+  .forecast-stat strong{display:block;margin:3px 0;font:600 20px 'IBM Plex Mono',monospace;color:#12392E;}
+  .hour-strip{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:3px;margin-top:12px;}
+  .hour-point{height:30px;min-width:0;padding:0;border:0;border-radius:2px;background:#DCE5DF;cursor:pointer;transition:background .16s ease,transform .16s ease;}
+  .hour-point:hover{transform:translateY(-2px);background:#A8C2B2;}
+  .hour-point[aria-pressed="true"]{background:#D46A42;box-shadow:0 0 0 2px #FBFCFB,0 0 0 3px #D46A42;}
+  .hour-point.at-risk:not([aria-pressed="true"]){background:#D9A59A;}
+  .hour-point:focus-visible{outline:2px solid #12392E;outline-offset:2px;}
+  .btn.primary{color:#fff;}
+  @media (max-width:760px){
+    .readout{font-size:68px;}
+    .hour-strip{grid-template-columns:repeat(12,minmax(0,1fr));}
+  }
+  @media (max-width:520px){
+    .hero{padding:30px 0 26px;}
+    .readout{font-size:56px;}
+    .forecast-summary{grid-template-columns:1fr;}
+    .forecast-stat{padding:10px 12px;}
+    .hour-strip{grid-template-columns:repeat(8,minmax(0,1fr));}
+  }
 </style>
 </head>
 <body>
-
 <header>
   <div class="wrap">
     <div class="wordmark">Nyika<span>-Grid</span></div>
@@ -516,7 +596,10 @@
     <rect width="100%" height="100%" fill="url(#gridPattern)"/>
   </svg>
   <div class="wrap">
-    <div class="hero-region-label" id="heroRegionLabel">Loading region…</div>
+    <div class="hero-meta">
+      <div class="hero-region-label" id="heroRegionLabel">Loading region…</div>
+      <time class="local-clock" id="localClock" aria-label="Current time in Zambia">--:-- CAT</time>
+    </div>
     <div class="readout-row">
       <div class="readout" id="netLoadReadout">—</div>
       <div class="readout-unit">MW net load</div>
@@ -560,10 +643,10 @@
     </div>
 
     <div class="whatif-row">
-      <button class="btn" id="btnHeatwave">🔥 Heatwave (+5°C)</button>
-      <button class="btn" id="btnCloudy">☁️ Cloudy day (+60%)</button>
-      <button class="btn" id="btnWeather">Live weather</button>
-      <button class="btn primary" id="btnRefresh">Refresh forecast</button>
+      <button class="btn" id="btnHeatwave">Heatwave +5°C</button>
+      <button class="btn" id="btnCloudy">Cloud cover +60%</button>
+      <button class="btn" id="btnWeather">Fetch live weather</button>
+      <button class="btn primary" id="btnRefresh">Refresh outlook</button>
     </div>
     <div class="weather-status" id="weatherStatus" aria-live="polite">Waiting for region data…</div>
   </div>
@@ -572,12 +655,18 @@
 <section class="block">
   <div class="wrap">
     <div class="block-head">
-      <h2>24-hour outlook</h2>
-      <div class="block-note">Held at the current temperature, cloud cover, and day type <span id="forecastUpdated" aria-live="polite"></span></div>
+      <h2>24-hour forecast</h2>
+      <div class="block-note">Model output · selected conditions <span id="forecastUpdated" aria-live="polite"></span></div>
+    </div>
+    <div class="forecast-summary" aria-live="polite">
+      <div class="forecast-stat"><span>Peak net demand</span><strong id="peakNetValue">— MW</strong><small id="peakHourLabel">Awaiting forecast</small></div>
+      <div class="forecast-stat"><span>Solar energy, forecast day</span><strong id="solarEnergyValue">— MWh</strong><small>Hourly generation summed across the forecast</small></div>
+      <div class="forecast-stat"><span>Lowest net demand</span><strong id="lowNetValue">— MW</strong><small id="lowHourLabel">Awaiting forecast</small></div>
     </div>
     <div class="chart-card">
       <canvas id="forecastChart" height="90"></canvas>
     </div>
+    <div class="hour-strip" id="hourStrip" role="group" aria-label="Select forecast hour"></div>
   </div>
 </section>
 
@@ -616,7 +705,6 @@
         <span id="chatContextLabel">Live system context</span>
       </div>
       <div class="chat-transcript" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions text">
-        <div class="chat-message assistant">Ask about the selected region’s forecast, load-shedding outlook, or battery plan.</div>
       </div>
       <form class="chat-composer" id="chatForm">
         <textarea id="chatInput" rows="2" maxlength="2000" placeholder="Ask about the current system…" aria-label="Message the Nyika-Grid Assistant" required></textarea>
@@ -665,16 +753,32 @@
 
   let REGIONS = [];
 
+  function zambiaTimeParts(){
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Africa/Lusaka", hour: "2-digit", minute: "2-digit",
+      weekday: "short", month: "2-digit", hourCycle: "h23"
+    }).formatToParts(new Date());
+    return Object.fromEntries(parts.filter(part => part.type !== "literal").map(part => [part.type, part.value]));
+  }
+
+  let preferences = {};
+  try{
+    preferences = JSON.parse(window.localStorage.getItem("nyikaGridPreferences") || "{}");
+  }catch(e){
+    preferences = {};
+  }
+
   const state = {
-    apiBase: document.getElementById("apiBaseInput").value.trim(),
-    region: null,
-    hour: new Date().getHours(),
-    temperature: Number(document.getElementById("tempSlider").value),
-    cloud: Number(document.getElementById("cloudSlider").value),
-    initialSoc: Number(document.getElementById("initialSocSlider").value),
-    weekend: [0, 6].includes(new Date().getDay()),
+    apiBase: preferences.apiBase || document.getElementById("apiBaseInput").value.trim(),
+    region: preferences.region || null,
+    hour: Number.isInteger(preferences.hour) && preferences.hour >= 0 && preferences.hour <= 23 ? preferences.hour : Number(zambiaTimeParts().hour),
+    temperature: Number.isFinite(preferences.temperature) ? preferences.temperature : Number(document.getElementById("tempSlider").value),
+    cloud: Number.isFinite(preferences.cloud) ? preferences.cloud : Number(document.getElementById("cloudSlider").value),
+    initialSoc: Number.isFinite(preferences.initialSoc) ? preferences.initialSoc : Number(document.getElementById("initialSocSlider").value),
+    weekend: typeof preferences.weekend === "boolean" ? preferences.weekend : ["Sat", "Sun"].includes(zambiaTimeParts().weekday),
     apiOnline: false
   };
+  document.getElementById("apiBaseInput").value = state.apiBase;
 
   let chart = null;
   let latestForecast = null;
@@ -690,6 +794,7 @@
   let chatRequestId = 0;
   let chatProviderAvailable = false;
   let chatHistory = [];
+  let clockTimer = null;
 
   // ---------- DOM refs ----------
   const el = {
@@ -697,9 +802,16 @@
     connDot: document.getElementById("connDot"),
     connLabel: document.getElementById("connLabel"),
     heroRegionLabel: document.getElementById("heroRegionLabel"),
+    localClock: document.getElementById("localClock"),
     netLoadReadout: document.getElementById("netLoadReadout"),
     statusPill: document.getElementById("statusPill"),
     forecastUpdated: document.getElementById("forecastUpdated"),
+    peakNetValue: document.getElementById("peakNetValue"),
+    peakHourLabel: document.getElementById("peakHourLabel"),
+    solarEnergyValue: document.getElementById("solarEnergyValue"),
+    lowNetValue: document.getElementById("lowNetValue"),
+    lowHourLabel: document.getElementById("lowHourLabel"),
+    hourStrip: document.getElementById("hourStrip"),
     rawLoadValue: document.getElementById("rawLoadValue"),
     solarValue: document.getElementById("solarValue"),
     hourValue: document.getElementById("hourValue"),
@@ -740,6 +852,7 @@
       btn.textContent = r.label.replace(" Grid","").replace(" Mini-Grid"," Mini-Grid");
       btn.dataset.key = r.key;
       if(r.key === state.region) btn.classList.add("active");
+      btn.setAttribute("aria-pressed", String(r.key === state.region));
       btn.addEventListener("click", () => {
         state.region = r.key;
         renderRegionSwitch();
@@ -754,18 +867,6 @@
   function regionLabel(key){
     const r = REGIONS.find(x => x.key === key);
     return r ? r.label : key;
-  }
-
-  async function loadRegions(){
-    const data = await apiGet("/regions");
-    REGIONS = Object.entries(data).map(([key, config]) => ({
-      key,
-      label: config.label,
-      alertThreshold: config.alert_threshold_mw
-    }));
-    if(REGIONS.length === 0) throw new Error("No regions are configured.");
-    if(!REGIONS.some(region => region.key === state.region)) state.region = REGIONS[0].key;
-    renderRegionSwitch();
   }
 
   // ---------- API helpers ----------
@@ -787,8 +888,16 @@
   async function checkConnection(){
     const requestId = ++connectionRequestId;
     try{
-      await apiGet("/regions");
+      const data = await apiGet("/regions");
       if(requestId !== connectionRequestId) return state.apiOnline;
+      REGIONS = Object.entries(data).map(([key, config]) => ({
+        key,
+        label: config.label,
+        alertThreshold: config.alert_threshold_mw
+      }));
+      if(REGIONS.length === 0) throw new Error("No regions are configured.");
+      if(!REGIONS.some(region => region.key === state.region)) state.region = REGIONS[0].key;
+      renderRegionSwitch();
       state.apiOnline = true;
       el.connDot.classList.remove("offline");
       el.connLabel.textContent = "API connected";
@@ -835,7 +944,7 @@
     el.heroRegionLabel.textContent = regionLabel(state.region);
     el.hourValue.textContent = state.hour + ":00";
 
-    const month = new Date().getMonth() + 1;
+    const month = Number(zambiaTimeParts().month);
     const qs = `?region=${encodeURIComponent(state.region)}&temperature_c=${state.temperature}&is_weekend=${state.weekend?1:0}&cloud_cover_pct=${state.cloud}&month=${month}`;
 
     let data;
@@ -850,6 +959,7 @@
     if(requestId !== forecastRequestId) return;
 
     const idx = data.hours.indexOf(state.hour);
+    if(idx < 0) return;
     const load = data.load_mw[idx];
     const solar = data.solar_mw[idx];
     const net = data.net_load_mw[idx];
@@ -866,9 +976,46 @@
       ? `⚠ Elevated risk — load above ${threshold.toFixed(0)} MW threshold`
       : `✓ Stable — within ${threshold.toFixed(0)} MW threshold`;
 
+    const peakIndex = data.net_load_mw.indexOf(Math.max(...data.net_load_mw));
+    const lowIndex = data.net_load_mw.indexOf(Math.min(...data.net_load_mw));
+    el.peakNetValue.textContent = data.net_load_mw[peakIndex].toFixed(1) + " MW";
+    el.peakHourLabel.textContent = `Peak at ${String(data.hours[peakIndex]).padStart(2, "0")}:00`;
+    el.solarEnergyValue.textContent = data.solar_mw.reduce((total, value) => total + value, 0).toFixed(1) + " MWh";
+    el.lowNetValue.textContent = data.net_load_mw[lowIndex].toFixed(1) + " MW";
+    el.lowHourLabel.textContent = `Low at ${String(data.hours[lowIndex]).padStart(2, "0")}:00`;
+    renderHourStrip(data);
+
     latestForecast = data;
     el.forecastUpdated.textContent = " · Updated " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     renderChart(data);
+  }
+
+  function renderHourStrip(data){
+    const maximum = Math.max(...data.net_load_mw, 1);
+    el.hourStrip.replaceChildren();
+    data.hours.forEach((hour, index) => {
+      const point = document.createElement("button");
+      point.type = "button";
+      point.className = "hour-point" + (data.load_mw[index] >= data.alert_threshold_mw ? " at-risk" : "");
+      point.style.height = `${Math.round(14 + 20 * Math.max(data.net_load_mw[index], 0) / maximum)}px`;
+      point.title = `${String(hour).padStart(2, "0")}:00 · ${data.net_load_mw[index].toFixed(1)} MW net demand`;
+      point.setAttribute("aria-label", point.title);
+      point.setAttribute("aria-pressed", String(hour === state.hour));
+      point.addEventListener("click", () => {
+        state.hour = hour;
+        el.hourSlider.value = hour;
+        el.hourLabel.textContent = hour;
+        queueRefresh();
+      });
+      el.hourStrip.appendChild(point);
+    });
+  }
+
+  function updateLocalClock(){
+    el.localClock.textContent = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Africa/Lusaka", hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+    }).format(new Date()) + " CAT";
+    el.localClock.dateTime = new Date().toISOString();
   }
 
   function renderChart(data){
@@ -1211,6 +1358,22 @@
     });
   }
 
+  function savePreferences(){
+    try{
+      window.localStorage.setItem("nyikaGridPreferences", JSON.stringify({
+        apiBase: state.apiBase,
+        region: state.region,
+        hour: state.hour,
+        temperature: state.temperature,
+        cloud: state.cloud,
+        initialSoc: state.initialSoc,
+        weekend: state.weekend
+      }));
+    }catch(e){
+      return;
+    }
+  }
+
   // ---------- Orchestration ----------
   function queueRefresh(){
     window.clearTimeout(refreshTimer);
@@ -1219,6 +1382,7 @@
 
   async function refreshAll(){
     const requestId = ++refreshRequestId;
+    savePreferences();
     el.btnRefresh.disabled = true;
     el.btnRefresh.setAttribute("aria-busy", "true");
     el.btnRefresh.textContent = "Updating…";
@@ -1236,25 +1400,20 @@
   }
 
   async function init(){
-    state.hour = new Date().getHours();
-    state.weekend = [0, 6].includes(new Date().getDay());
+    updateLocalClock();
+    clockTimer = window.setInterval(updateLocalClock, 30000);
     el.hourSlider.value = state.hour;
     el.hourLabel.textContent = state.hour;
+    el.tempSlider.value = state.temperature;
+    el.tempLabel.textContent = state.temperature + "°C";
+    el.cloudSlider.value = state.cloud;
+    el.cloudLabel.textContent = state.cloud + "%";
+    el.initialSocSlider.value = state.initialSoc;
+    el.initialSocLabel.textContent = state.initialSoc + "%";
     el.weekendCheck.checked = state.weekend;
-    try{
-      await loadRegions();
-    }catch(e){
-      el.connDot.classList.add("offline");
-      el.connLabel.textContent = "API unreachable — start uvicorn and check the API base below";
-      el.regionSwitch.textContent = "No region data available";
-      el.weatherStatus.textContent = "Connect to the API to load forecasts.";
-      el.btnWeather.disabled = true;
-      el.btnRefresh.disabled = true;
-      return;
-    }
     wireControls();
-    refreshChatStatus();
     await refreshAll();
+    refreshChatStatus();
     refreshLiveWeather();
   }
 
